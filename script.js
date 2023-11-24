@@ -38,8 +38,25 @@ function enableCurrentRow() {
     rows[currentRowIndex].forEach(cell => {
         cell.disabled = false;
         cell.addEventListener('input', handleInput);
+        cell.addEventListener('keydown', handleBackspace);
     });
 }
+
+function handleBackspace(e) {
+    if (e.key === 'Backspace') {
+        if (e.target.value === '') {
+            // Focus the previous cell if the current cell is empty
+            const cellIndex = Array.from(e.target.parentNode.children).indexOf(e.target);
+            if (cellIndex > 0) {
+                rows[currentRowIndex][cellIndex - 1].focus();
+            }
+        } else {
+            // Clear the current cell
+            e.target.value = '';
+        }
+    }
+}
+
 
 function handleInput(e) {
     e.target.value = e.target.value.toUpperCase();
@@ -79,7 +96,7 @@ function checkGuess() {
     }
 
     if (guess === dailyWord) {
-        currentRow.forEach(cell => cell.style.backgroundColor = '#4CAF50');
+        currentRow.forEach(cell => cell.style.backgroundColor = 'green');
         resultDisplay.textContent = 'Congratulations! You guessed right!';
         rows.forEach(row => row.forEach(cell => cell.disabled = true));
         gameResult = 'win'; // Set the game result to win
@@ -88,9 +105,9 @@ function checkGuess() {
         for (let i = 0; i < guess.length; i++) {
             const cell = currentRow[i];
             if (guess[i] === dailyWord[i]) {
-                cell.style.backgroundColor = '#4CAF50';
+                cell.style.backgroundColor = 'green';
             } else if (dailyWord.includes(guess[i])) {
-                cell.style.backgroundColor = '#FFEB3B';
+                cell.style.backgroundColor = 'yellow';
             } else {
                 cell.style.backgroundColor = 'grey';
             }
@@ -130,9 +147,9 @@ function createShareMessage() {
 
     for (let rowIndex = 0; rowIndex <= currentRowIndex; rowIndex++) {
         for (let cell of rows[rowIndex]) {
-            if (cell.style.backgroundColor === '#4CAF50') { // Correct position
+            if (cell.style.backgroundColor === 'green') { // Correct position
                 message += '🟩';
-            } else if (cell.style.backgroundColor === '#FFEB3B') { // Present but wrong position
+            } else if (cell.style.backgroundColor === 'yellow') { // Present but wrong position
                 message += '🟨';
             } else { // Absent
                 message += '⬛';
