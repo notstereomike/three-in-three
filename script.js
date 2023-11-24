@@ -9,6 +9,7 @@ const submitButton = document.getElementById('submit-button');
 const resultDisplay = document.getElementById('result');
 
 let currentRowIndex = 0; // Start with the first row
+const dailyWord = getDailyWord().toUpperCase();
 
 function seededShuffle(array, seed) {
     let currentIndex = array.length, temporaryValue, randomIndex;
@@ -33,17 +34,10 @@ function getDailyWord() {
     return shuffledWords[0];
 }
 
-const dailyWord = getDailyWord().toUpperCase();
-
 function enableCurrentRow() {
     rows[currentRowIndex].forEach(cell => {
         cell.disabled = false;
         cell.addEventListener('input', handleInput);
-        cell.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                submitGuess();
-            }
-        });
     });
 }
 
@@ -54,6 +48,22 @@ function handleInput(e) {
     if (nextCell && rows[currentRowIndex].includes(nextCell)) {
         nextCell.focus(); // Move to next cell in the current row
     }
+}
+
+function submitGuess() {
+    const currentRow = rows[currentRowIndex];
+    if (currentRow.some(cell => cell.value === '')) {
+        resultDisplay.textContent = 'Please fill all cells in the current row.';
+        return;
+    }
+
+    currentRow.forEach(cell => cell.disabled = true);
+    checkGuess();
+}
+
+// Function to hide the submit button
+function hideSubmitButton() {
+    submitButton.style.display = 'none';
 }
 
 function checkGuess() {
@@ -67,12 +77,12 @@ function checkGuess() {
     }
 
     if (guess === dailyWord) {
-        // If the guess is correct, make all cells green
         currentRow.forEach(cell => cell.style.backgroundColor = 'green');
         resultDisplay.textContent = 'Congratulations! You guessed right!';
         rows.forEach(row => row.forEach(cell => cell.disabled = true));
+        changeButtonToShare();
+        
     } else {
-        // Check each letter in the guess
         for (let i = 0; i < guess.length; i++) {
             const cell = currentRow[i];
             if (guess[i] === dailyWord[i]) {
@@ -90,6 +100,7 @@ function checkGuess() {
         } else {
             resultDisplay.textContent = `Game Over. The word was ${dailyWord}.`;
             rows.forEach(row => row.forEach(cell => cell.disabled = true));
+            changeButtonToShare();
         }
     }
 }
@@ -97,20 +108,85 @@ function checkGuess() {
 function resetCurrentRow() {
     rows[currentRowIndex].forEach(cell => {
         cell.value = '';
-        cell.style.backgroundColor = ''; // Reset background color
+        cell.style.backgroundColor = '';
         cell.disabled = false;
     });
 }
 
-enableCurrentRow();
+function changeButtonToShare() {
+    submitButton.textContent = 'Share';
+    submitButton.removeEventListener('click', submitGuess);
+    submitButton.addEventListener('click', shareResult);
+}
 
-submitButton.addEventListener('click', () => {
-    const currentRow = rows[currentRowIndex];
-    if (currentRow.some(cell => cell.value === '')) {
-        resultDisplay.textContent = 'Please fill all cells in the current row.';
-        return;
+function createShareMessage() {
+    let attempts = currentRowIndex + 1;
+    let message = '';
+
+    if (storedResult === 'win') {
+        message = `I won! :) I got the word in ${attempts} attempts!\n\n`;
+    } else {
+        message = "I lost :( I didn't get the word today.\n\n";
     }
 
-    currentRow.forEach(cell => cell.disabled = true);
-    checkGuess();
-});
+    rows.forEach(row => {
+        row.forEach(cell => {
+            if (cell.style.backgroundColor === 'green') {
+                message += '🟩';
+            } else if (cell.style.backgroundColor === 'yellow') {
+                message += '🟨';
+            } else {
+                message += '⬛';
+            }
+        });
+        message += '\n';
+    });
+
+    return message;
+}
+
+function shareResult() {
+    if (navigator.share) {
+        navigator.share({
+            title: 'Three in Three Game Result',
+            text: createShareMessage()
+        }).then(() => {
+            console.log('Thanks for sharing!');
+        }).catch(console.error);
+    } else {
+        console.log('Web Share not supported on this browser.');
+    }
+}
+
+enableCurrentRow();
+submitButton.addEventListener('click', submitGuess);
+
+const storedProgress = localStorage.getItem('threeInThreeProgress');
+const storedResult = localStorage.getItem('threeInThreeResult');
+const storedDate = localStorage.getItem('threeInThreeDate');
+const today = new Date().toDateString();
+
+if (storedDate === today && storedProgress) {
+    // Logic to restore progress if the stored date is today
+    const previousProgress = JSON.parse(storedProgress);
+    previousProgress.forEach((guess, rowIndex) => {
+        guess.forEach((letter, cellIndex) => {
+            rows[rowIndex][cellIndex].value = letter;
+            rows[rowIndex][cellIndex].disabled = true;
+        });
+        if (rowIndex < rows.length - 1) {
+            currentRowIndex++;
+            enableCurrentRow();
+        }
+    });
+
+    if (storedResult === 'win') {
+        resultDisplay.textContent = 'You found the word today, come back tomorrow!';
+        rows.forEach(row => row.forEach(cell => cell.disabled = true));
+        hideSubmitButton(); // Hide the submit button
+    } else if (storedResult === 'lose') {
+        resultDisplay.textContent = 'You didn\'t find the word today! Come back tomorrow to try again!';
+        rows.forEach(row => row.forEach(cell => cell.disabled = true));
+        hideSubmitButton(); // Hide the submit button
+    }
+}

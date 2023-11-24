@@ -2,4 +2,4 @@
 
 Wordle clone for 3 letter words
 
-Url:
+Url: https://notstereomike.github.io/three-in-three/

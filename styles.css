@@ -1,6 +1,6 @@
 body, html {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    background-color: #ffffff;
     height: 100vh;
     margin: 0;
     display: flex;
@@ -71,4 +71,10 @@ h1 {
         font-size: 1.5em;
         padding: 5px;
     }
+}
+
+#game-logo {
+    width: 170px; /* Adjust the size as needed */
+    margin: 0 auto; /* Center the logo if needed */
+    /* Add more styling rules as necessary */
 }
