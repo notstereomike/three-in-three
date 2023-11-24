@@ -66,6 +66,8 @@ function hideSubmitButton() {
     submitButton.style.display = 'none';
 }
 
+let gameResult = ''; // Declare this variable at the start of your script
+
 function checkGuess() {
     const currentRow = rows[currentRowIndex];
     const guess = currentRow.map(cell => cell.value.toUpperCase()).join('');
@@ -80,8 +82,8 @@ function checkGuess() {
         currentRow.forEach(cell => cell.style.backgroundColor = 'green');
         resultDisplay.textContent = 'Congratulations! You guessed right!';
         rows.forEach(row => row.forEach(cell => cell.disabled = true));
+        gameResult = 'win'; // Set the game result to win
         changeButtonToShare();
-        
     } else {
         for (let i = 0; i < guess.length; i++) {
             const cell = currentRow[i];
@@ -100,10 +102,12 @@ function checkGuess() {
         } else {
             resultDisplay.textContent = `Game Over. The word was ${dailyWord}.`;
             rows.forEach(row => row.forEach(cell => cell.disabled = true));
+            gameResult = 'lose'; // Set the game result to lose
             changeButtonToShare();
         }
     }
 }
+
 
 function resetCurrentRow() {
     rows[currentRowIndex].forEach(cell => {
@@ -123,17 +127,17 @@ function createShareMessage() {
     let attempts = currentRowIndex + 1;
     let message = '';
 
-    if (storedResult === 'win') {
-        message = `I won! :) I got the word in ${attempts} attempts!\n\n`;
+    if (gameResult === 'win') {
+        message = `I won! 😊 I got the word in ${attempts} attempts!\n\n`;
     } else {
-        message = "I lost :( I didn't get the word today.\n\n";
+        message = "I lost 😞 I didn't get the word today.\n\n";
     }
 
     rows.forEach(row => {
         row.forEach(cell => {
-            if (cell.style.backgroundColor === 'green') {
+            if (cell.style.backgroundColor === 'green' || cell.style.backgroundColor === '#4CAF50') { // Adjust as per your color coding
                 message += '🟩';
-            } else if (cell.style.backgroundColor === 'yellow') {
+            } else if (cell.style.backgroundColor === 'yellow' || cell.style.backgroundColor === '#FFEB3B') { // Adjust as per your color coding
                 message += '🟨';
             } else {
                 message += '⬛';
@@ -144,6 +148,7 @@ function createShareMessage() {
 
     return message;
 }
+
 
 function shareResult() {
     if (navigator.share) {
