@@ -125,22 +125,18 @@ function changeButtonToShare() {
 
 function createShareMessage() {
     let attempts = currentRowIndex + 1;
-    let message = '';
-
-    if (gameResult === 'win') {
-        message = `I won! 😊 I got the word in ${attempts} attempts!\n\n`;
-    } else {
-        message = "I lost 😞 I didn't get the word today.\n\n";
-    }
+    let message = gameResult === 'win'
+        ? `I won! 😊 I got the word in ${attempts} attempts!\n\n`
+        : "I lost 😞 I didn't get the word today.\n\n";
 
     rows.forEach(row => {
         row.forEach(cell => {
-            if (cell.style.backgroundColor === 'green' || cell.style.backgroundColor === '#4CAF50') { // Adjust as per your color coding
+            if (cell.style.backgroundColor === 'green' || cell.style.backgroundColor === '#4CAF50') { // Adjust to your game's green color
                 message += '🟩';
-            } else if (cell.style.backgroundColor === 'yellow' || cell.style.backgroundColor === '#FFEB3B') { // Adjust as per your color coding
+            } else if (cell.style.backgroundColor === 'yellow' || cell.style.backgroundColor === '#FFEB3B') { // Adjust to your game's yellow color
                 message += '🟨';
             } else {
-                message += '⬛';
+                message += '⬛'; // For grey or any other color
             }
         });
         message += '\n';
@@ -148,6 +144,7 @@ function createShareMessage() {
 
     return message;
 }
+
 
 
 function shareResult() {
