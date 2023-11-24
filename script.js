@@ -79,7 +79,7 @@ function checkGuess() {
     }
 
     if (guess === dailyWord) {
-        currentRow.forEach(cell => cell.style.backgroundColor = 'green');
+        currentRow.forEach(cell => cell.style.backgroundColor = '#4CAF50');
         resultDisplay.textContent = 'Congratulations! You guessed right!';
         rows.forEach(row => row.forEach(cell => cell.disabled = true));
         gameResult = 'win'; // Set the game result to win
@@ -143,7 +143,6 @@ function createShareMessage() {
 
     return message;
 }
-
 
 
 function shareResult() {
