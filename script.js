@@ -11,8 +11,6 @@ const resultDisplay = document.getElementById('result');
 let currentRowIndex = 0; // Start with the first row
 const dailyWord = getDailyWord().toUpperCase();
 
-let guessStates = [];
-
 function seededShuffle(array, seed) {
     let currentIndex = array.length, temporaryValue, randomIndex;
     function seededRandom() {
@@ -73,7 +71,6 @@ let gameResult = ''; // Declare this variable at the start of your script
 function checkGuess() {
     const currentRow = rows[currentRowIndex];
     const guess = currentRow.map(cell => cell.value.toUpperCase()).join('');
-    let guessState = [];
 
     if (!words.includes(guess.toLowerCase())) {
         resultDisplay.textContent = 'Word not in list. Try again.';
@@ -91,14 +88,11 @@ function checkGuess() {
         for (let i = 0; i < guess.length; i++) {
             const cell = currentRow[i];
             if (guess[i] === dailyWord[i]) {
-                cell.style.backgroundColor = '#4CAF50'; // Correct position
-                guessState.push('#4CAF50');
+                cell.style.backgroundColor = '#4CAF50';
             } else if (dailyWord.includes(guess[i])) {
-                cell.style.backgroundColor = '#FFEB3B'; // Letter is in the word but wrong position
-                guessState.push('#FFEB3B');
+                cell.style.backgroundColor = '#FFEB3B';
             } else {
-                cell.style.backgroundColor = 'grey'; // Letter not in the word
-                guessState.push('grey');
+                cell.style.backgroundColor = 'grey';
             }
         }
 
@@ -134,24 +128,21 @@ function createShareMessage() {
         ? `I won! 😊 I got the word in ${currentRowIndex + 1} attempts!\n\n`
         : "I lost 😞 I didn't get the word today.\n\n";
 
-    guessStates.forEach((guessState, rowIndex) => {
-        if (rowIndex <= currentRowIndex) {
-            guessState.forEach(color => {
-                if (color === '#4CAF50') { // Correct position
-                    message += '🟩';
-                } else if (color === '#FFEB3B') { // Letter is in the word but wrong position
-                    message += '🟨';
-                } else { // Letter not in the word
-                    message += '⬛';
-                }
-            });
-            message += '\n';
+    for (let rowIndex = 0; rowIndex <= currentRowIndex; rowIndex++) {
+        for (let cell of rows[rowIndex]) {
+            if (cell.style.backgroundColor === '#4CAF50') { // Correct position
+                message += '🟩';
+            } else if (cell.style.backgroundColor === '#FFEB3B') { // Present but wrong position
+                message += '🟨';
+            } else { // Absent
+                message += '⬛';
+            }
         }
-    });
+        message += '\n';
+    }
 
     return message;
 }
-
 
 
 
@@ -200,3 +191,4 @@ if (storedDate === today && storedProgress) {
         hideSubmitButton(); // Hide the submit button
     }
 }
+
