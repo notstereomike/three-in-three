@@ -11,6 +11,8 @@ const resultDisplay = document.getElementById('result');
 let currentRowIndex = 0; // Start with the first row
 const dailyWord = getDailyWord().toUpperCase();
 
+let guessStates = [];
+
 function seededShuffle(array, seed) {
     let currentIndex = array.length, temporaryValue, randomIndex;
     function seededRandom() {
@@ -71,6 +73,7 @@ let gameResult = ''; // Declare this variable at the start of your script
 function checkGuess() {
     const currentRow = rows[currentRowIndex];
     const guess = currentRow.map(cell => cell.value.toUpperCase()).join('');
+    let guessState = [];
 
     if (!words.includes(guess.toLowerCase())) {
         resultDisplay.textContent = 'Word not in list. Try again.';
@@ -89,10 +92,13 @@ function checkGuess() {
             const cell = currentRow[i];
             if (guess[i] === dailyWord[i]) {
                 cell.style.backgroundColor = '#4CAF50';
+                guessState.push('green');
             } else if (dailyWord.includes(guess[i])) {
                 cell.style.backgroundColor = '#FFEB3B';
+                guessState.push('yellow');
             } else {
                 cell.style.backgroundColor = 'grey';
+                guessState.push('black');
             }
         }
 
@@ -128,21 +134,24 @@ function createShareMessage() {
         ? `I won! 😊 I got the word in ${currentRowIndex + 1} attempts!\n\n`
         : "I lost 😞 I didn't get the word today.\n\n";
 
-    for (let rowIndex = 0; rowIndex <= currentRowIndex; rowIndex++) {
-        for (let cell of rows[rowIndex]) {
-            if (cell.style.backgroundColor === 'green' || cell.style.backgroundColor === '#4CAF50') {
-                message += '🟩';
-            } else if (cell.style.backgroundColor === 'yellow' || cell.style.backgroundColor === '#FFEB3B') {
-                message += '🟨';
-            } else {
-                message += '⬛';
-            }
+    guessStates.forEach((guessState, rowIndex) => {
+        if (rowIndex <= currentRowIndex) {
+            guessState.forEach(color => {
+                if (color === 'green') {
+                    message += '🟩';
+                } else if (color === 'yellow') {
+                    message += '🟨';
+                } else {
+                    message += '⬛';
+                }
+            });
+            message += '\n';
         }
-        message += '\n';
-    }
+    });
 
     return message;
 }
+
 
 
 function shareResult() {
