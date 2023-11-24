@@ -124,29 +124,26 @@ function changeButtonToShare() {
 }
 
 function createShareMessage() {
-    let attempts = currentRowIndex + 1;
     let message = gameResult === 'win'
-        ? `I won! 😊 I got the word in ${attempts} attempts!\n\n`
+        ? `I won! 😊 I got the word in ${currentRowIndex + 1} attempts!\n\n`
         : "I lost 😞 I didn't get the word today.\n\n";
 
-    rows.forEach((row, rowIndex) => {
-        // Only include rows that were part of the attempts
-        if (rowIndex <= currentRowIndex) {
-            row.forEach(cell => {
-                if (cell.style.backgroundColor === 'green' || cell.style.backgroundColor === '#4CAF50') { // Adjust to your game's green color
-                    message += '🟩';
-                } else if (cell.style.backgroundColor === 'yellow' || cell.style.backgroundColor === '#FFEB3B') { // Adjust to your game's yellow color
-                    message += '🟨';
-                } else {
-                    message += '⬛'; // For grey or any other color
-                }
-            });
-            message += '\n';
+    for (let rowIndex = 0; rowIndex <= currentRowIndex; rowIndex++) {
+        for (let cell of rows[rowIndex]) {
+            if (cell.style.backgroundColor === 'green' || cell.style.backgroundColor === '#4CAF50') {
+                message += '🟩';
+            } else if (cell.style.backgroundColor === 'yellow' || cell.style.backgroundColor === '#FFEB3B') {
+                message += '🟨';
+            } else {
+                message += '⬛';
+            }
         }
-    });
+        message += '\n';
+    }
 
     return message;
 }
+
 
 function shareResult() {
     if (navigator.share) {
