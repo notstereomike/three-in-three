@@ -123,7 +123,7 @@ function changeButtonToShare() {
     submitButton.addEventListener('click', shareResult);
 }
 
-ffunction createShareMessage() {
+function createShareMessage() {
     let attempts = currentRowIndex + 1;
     let message = gameResult === 'win'
         ? `I won! 😊 I got the word in ${attempts} attempts!\n\n`
@@ -147,9 +147,6 @@ ffunction createShareMessage() {
 
     return message;
 }
-
-
-
 
 function shareResult() {
     if (navigator.share) {
