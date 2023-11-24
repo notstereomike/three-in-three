@@ -91,14 +91,14 @@ function checkGuess() {
         for (let i = 0; i < guess.length; i++) {
             const cell = currentRow[i];
             if (guess[i] === dailyWord[i]) {
-                cell.style.backgroundColor = '#4CAF50';
-                guessState.push('green');
+                cell.style.backgroundColor = '#4CAF50'; // Correct position
+                guessState.push('#4CAF50');
             } else if (dailyWord.includes(guess[i])) {
-                cell.style.backgroundColor = '#FFEB3B';
-                guessState.push('yellow');
+                cell.style.backgroundColor = '#FFEB3B'; // Letter is in the word but wrong position
+                guessState.push('#FFEB3B');
             } else {
-                cell.style.backgroundColor = 'grey';
-                guessState.push('black');
+                cell.style.backgroundColor = 'grey'; // Letter not in the word
+                guessState.push('grey');
             }
         }
 
@@ -137,11 +137,11 @@ function createShareMessage() {
     guessStates.forEach((guessState, rowIndex) => {
         if (rowIndex <= currentRowIndex) {
             guessState.forEach(color => {
-                if (color === 'green') {
+                if (color === '#4CAF50') { // Correct position
                     message += '🟩';
-                } else if (color === 'yellow') {
+                } else if (color === '#FFEB3B') { // Letter is in the word but wrong position
                     message += '🟨';
-                } else {
+                } else { // Letter not in the word
                     message += '⬛';
                 }
             });
@@ -151,6 +151,7 @@ function createShareMessage() {
 
     return message;
 }
+
 
 
 
